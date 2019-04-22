@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>getdays.info</title>
+<link rel="icon" type="image/png" href="http://www.getdays.info/img/Calendar-icon.png">
+
+<meta name='apple-mobile-web-app-capable' content='yes'>
+<meta name='apple-mobile-web-app-status-bar-style' content='black'>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property='og:url' content='http://www.getdays.info/'/>
+<meta property='og:title' content='Count the days'/>
+<meta property='og:type' content='website'/>
+<meta property='og:description' content='At getdays.info you can count the days between two dates or find out what will be the date after an amount of days have passed. Choose the dates and days on the forms and see how many days there are in the interim, or when will a certain. The default dates will tell you how many days there are since the first day of the current year, and the date a thousand days from today.'/>
+<meta property='og:image' content='http://www.getdays.info/img/Calendar-icon.png'/>
+
+<link rel='stylesheet' href='css/bootstrap.min.css'></link>
+<link rel='stylesheet' href='css/bootstrap-responsive.min.css'></link>
+<link rel='stylesheet' href='css/datepicker.css'></link>
+<style>
+#fromDate input:hover, #toDate input:hover {
+    cursor: default;
+}
+</style>
+<script src='js/jquery-1.7.2.min.js'></script>
+<script src='js/bootstrap.min.js'></script>
+<script src='js/bootstrap-datepicker.js'></script>
+<script src='js/date.format.js'></script>
+<script>
+var toDate;
+var fromDate;
+var baseDate;
+var daysDiff;
+
+function init() {
+    try {
+        var now = new Date();
+        toDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        fromDate = new Date(toDate.getFullYear(), 0, 1);
+        baseDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        daysDiff = 1000;
+
+        $('#fromDate').attr('data-date', fromDate.format('yyyy-mm-dd'));
+        $('#fromDate input').val(fromDate.format('yyyy-mm-dd'));
+        $('#toDate').attr('data-date', toDate.format('yyyy-mm-dd'));
+        $('#toDate input').val(toDate.format('yyyy-mm-dd'));
+        $('#baseDate').attr('data-date', baseDate.format('yyyy-mm-dd'));
+        $('#baseDate input').val(baseDate.format('yyyy-mm-dd'));
+        $('#daysDiff').val(daysDiff);
+
+        $('#fromDate').datepicker({
+            autoclose: true,
+            language: 'en',
+            startView: 'decade',
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function(ev) {
+            fromDate = new Date(ev.date.valueOf());
+            count();
+        });
+
+        $('#toDate').datepicker({
+            autoclose: true,
+            language: 'en',
+            startView: 'decade',
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function(ev) {
+            toDate = new Date(ev.date.valueOf());
+            count();
+        });
+
+        $('#baseDate').datepicker({
+            autoclose: true,
+            language: 'en',
+            startView: 'decade',
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function(ev) {
+            baseDate = new Date(ev.date.valueOf());
+            diff();
+        });
+
+        $('#daysDiff').bind('keydown keypress', function () {
+            setTimeout(function() {
+                daysDiff = $('#daysDiff').val();
+                if (isNaN(daysDiff)) {
+                    $('#daysDiffControl').addClass('error');
+                } else {
+                    $('#daysDiffControl').removeClass('error');
+                    diff();
+                }
+            }, 0);
+        });
+
+        count();
+        diff();
+    } catch (e) {
+        console.log(e.stack);
+    }
+}
+
+function count() {
+    try {
+        var dayMillis = 24 * 60 * 60 * 1000;
+        var diffMillis = toDate.getTime() - fromDate.getTime();
+        $('#days').html(Math.round(diffMillis / dayMillis));
+
+    } catch (e) {
+        console.log(e.stack);
+    }
+
+    return false;
+}
+
+function diff() {
+    try {
+        var diffDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+        diffDate.setHours(24 * daysDiff);
+        $('#localized').html('(' + diffDate.format('yyyy-mm-dd') + ')');
+        $('#diffDate').html(diffDate.toDateString());
+    } catch (e) {
+        console.log(e.stack);
+    }
+
+    return false;
+}
+</script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-33291043-1']);
+  _gaq.push(['_setDomainName', 'getdays.info']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body><script>$(document).ready(init);</script>
+
+<div class='container'>
+    <div class='row-fluid'>
+        <div class='span4'>
+            <h1>getdays.info</h1>
+        </div>
+    </div>
+    <div class='row-fluid'>
+        <div class='span6'>
+            <h3><small>Count the days between two dates</small></h3>
+            <form class='well' onsubmit='return count();'>
+                <label for='from-date'>From date:</label>
+                <div class='input-append date' id='fromDate' data-date='' data-date-format='yyyy-mm-dd'>
+                    <input class='span8' size='16' type='text' value='' disabled><span class='add-on'><i class='icon-calendar'></i></span>
+                </div>
+                <br/>
+                <label for='to-date'>Till date:</label>
+                <div class='input-append date' id='toDate' data-date='' data-date-format='yyyy-mm-dd'>
+                    <input class='span8' size='16' type='text' value='' disabled><span class='add-on'><i class='icon-calendar'></i></span>
+                </div>
+                <br/>
+                <label>There are:</label>
+                <h1><span id='days'></span> <small>days</small></h1>
+            </form>
+        </div>
+        <div class='span6'>
+            <h3><small>Find the date it will be after a number of days</small></h3>
+            <form class='well' onsubmit='return count();'>
+                <label for='base-date'>From date:</label>
+                <div class='input-append date' id='baseDate' data-date='' data-date-format='yyyy-mm-dd'>
+                    <input class='span8' size='16' type='text' value='' disabled><span class='add-on'><i class='icon-calendar'></i></span>
+                </div>
+                <br/>
+                <div id='daysDiffControl' class='control-group'>
+                    <label for='days-diff'>After this many:</label>
+                    <div class='input-append controls'>
+                        <input id='daysDiff' class='input-small' size='6' type='text' value=''><span class='add-on'> days</span>
+                        <div class="help-inline">Must be a number - can be negative.</div>
+                    </div>
+                </div>
+                <br/>
+                <label>It will be (or was):</label>
+                <h1><span id='diffDate'></span> <small id='localized'></small></h1>
+            </form>
+        </div>
+    </div>
+    <div class='row-fluid'>
+        <div class='span12'>
+            <p>At getdays.info you can count the days between two dates or find out what will be the date after an amount of days have passed. Choose the dates and days on the forms above and see how many days there are in the interim, or when will a certain. The default dates will tell you how many days there are since the first day of the current year, and the date a thousand days from today.
+            <hr/>
+            <p>(c) 2012 copyright moret.pro.br - Danilo Moret
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>
